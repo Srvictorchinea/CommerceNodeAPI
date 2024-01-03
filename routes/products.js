@@ -3,10 +3,22 @@ const express = require('express');
 const { Category } = require('../models/category');
 const router = express.Router();
 const mongoose = require('mongoose');
+const multer = require('multer');
+
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, 'public/uploads')
+  },
+  filename: function (req, file, cb) {
+    const fileName = file.originalname.split(' ').join('-');
+    cb(null, fileName + '-' + Date.now())
+  }
+})
+
+const uploadOptions = multer({ storage: storage })
 
 
 router.get(`/`, async (req, res) =>{
-    // localhost:3000/api/v1/products?categories=2342342,234234
     let filter = {};
     if(req.query.categories)
     {
@@ -30,15 +42,16 @@ router.get(`/:id`, async (req, res) =>{
     res.send(product);
 })
 
-router.post(`/`, async (req, res) =>{
+router.post(`/`, uploadOptions.single('image'), async (req, res) =>{
     const category = await Category.findById(req.body.category);
     if(!category) return res.status(400).send('Invalid Category')
-
+    const fileName = req.file.filename
+    const basePath = `${req.protocol}://${req.get('host')}/public/upload/`;
     let product = new Product({
         name: req.body.name,
         description: req.body.description,
         richDescription: req.body.richDescription,
-        image: req.body.image,
+        image: `${basePath}${fileName}`, 
         brand: req.body.brand,
         price: req.body.price,
         category: req.body.category,
@@ -60,7 +73,7 @@ router.put('/:id',async (req, res)=> {
     if(!mongoose.isValidObjectId(req.params.id)) {
        return res.status(400).send('Invalid Product Id')
     }
-    
+
     const product = await Product.findByIdAndUpdate(
         req.params.id,
         {
