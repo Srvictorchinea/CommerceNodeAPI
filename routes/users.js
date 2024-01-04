@@ -1,25 +1,25 @@
-const {User} = require('../models/user');
-const express = require('express');
-const router = express.Router();
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
+const {User} = require('../models/user') 
+const express = require('express') 
+const router = express.Router() 
+const bcrypt = require('bcryptjs') 
+const jwt = require('jsonwebtoken') 
 
 router.get(`/`, async (req, res) =>{
-    const userList = await User.find().select('-passwordHash');
+    const userList = await User.find().select('-passwordHash') 
 
     if(!userList) {
         res.status(500).json({success: false})
     } 
-    res.send(userList);
+    res.send(userList) 
 })
 
 router.get('/:id', async(req,res)=>{
-    const user = await User.findById(req.params.id).select('-passwordHash');
+    const user = await User.findById(req.params.id).select('-passwordHash') 
 
     if(!user) {
         res.status(500).json({message: 'The user with the given ID was not found.'})
     } 
-    res.status(200).send(user);
+    res.status(200).send(user) 
 })
 
 router.post('/', async (req,res)=>{
@@ -35,22 +35,22 @@ router.post('/', async (req,res)=>{
         city: req.body.city,
         country: req.body.country,
     })
-    user = await user.save();
+    user = await user.save() 
 
     if(!user)
     return res.status(400).send('the user cannot be created!')
 
-    res.send(user);
+    res.send(user) 
 })
 
 router.put('/:id',async (req, res)=> {
 
-    const userExist = await User.findById(req.params.id);
+    const userExist = await User.findById(req.params.id) 
     let newPassword
     if(req.body.password) {
         newPassword = bcrypt.hashSync(req.body.password, 10)
     } else {
-        newPassword = userExist.passwordHash;
+        newPassword = userExist.passwordHash 
     }
 
     const user = await User.findByIdAndUpdate(
@@ -73,14 +73,14 @@ router.put('/:id',async (req, res)=> {
     if(!user)
     return res.status(400).send('the user cannot be created!')
 
-    res.send(user);
+    res.send(user) 
 })
 
 router.post('/login', async (req,res) => {
     const user = await User.findOne({email: req.body.email})
-    const secret = process.env.SECRET;
+    const secret = process.env.SECRET 
     if(!user) {
-        return res.status(400).send('The user not found');
+        return res.status(400).send('The user not found') 
     }
 
     if(user && bcrypt.compareSync(req.body.passwordHash, user.passwordHash)) {
@@ -95,7 +95,7 @@ router.post('/login', async (req,res) => {
        
         res.status(200).send({user: user.email , token: token}) 
     } else {
-       res.status(400).send('password is wrong!');
+       res.status(400).send('password is wrong!') 
     }
 
     
@@ -115,12 +115,12 @@ router.post('/register', async (req,res)=>{
         city: req.body.city,
         country: req.body.country,
     })
-    user = await user.save();
+    user = await user.save() 
 
     if(!user)
     return res.status(400).send('the user cannot be created!')
 
-    res.send(user);
+    res.send(user) 
 })
 
 
@@ -144,8 +144,8 @@ router.get(`/get/count`, async (req, res) =>{
     } 
     res.send({
         userCount: userCount
-    });
+    }) 
 })
 
 
-module.exports =router;
+module.exports =router 

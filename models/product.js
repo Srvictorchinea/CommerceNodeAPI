@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+const mongoose = require('mongoose')
 
 const productSchema = mongoose.Schema({
     name: {
@@ -58,7 +58,7 @@ const productSchema = mongoose.Schema({
 })
 
 productSchema.virtual('id').get(function () {
-    return this._id.toHexString();
+    return this._id.toHexString()
 });
 
 productSchema.set('toJSON', {
@@ -66,4 +66,4 @@ productSchema.set('toJSON', {
 });
 
 
-exports.Product = mongoose.model('Product', productSchema);
+exports.Product = mongoose.model('Product', productSchema)
